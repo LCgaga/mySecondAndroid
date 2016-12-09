@@ -1,5 +1,6 @@
 package com.example.administrator.myapplication.miniWeather;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +15,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.example.administrator.myapplication.R;
 import com.example.administrator.myapplication.bean.TodayWeather;
 import com.example.administrator.myapplication.util.NetUtil;
@@ -33,7 +38,7 @@ import java.net.URL;
 /**
  * Created by Administrator on 2016/9/21.
  */
-public class MainActivity extends ActionBarActivity implements OnClickListener {
+public class MainActivity extends Activity implements OnClickListener {
 
     private TextView cityTv, timeTv, humidityTv, weekTv,
             weekTv_b1, weekTv_today, weekTv_a1,weekTv_a2, weekTv_a3, weekTv_a4,
@@ -44,11 +49,19 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
             weatherImg_b1,weatherImg_today, weatherImg_a1, weatherImg_a2, weatherImg_a3, weatherImg_a4;
     private ImageView mCitySelect;
     private ImageView mUpdateBtn;
+    private ImageView mLocation;
     private ProgressBar pbar;
+
+    //声明AMapLocationClient类对象
+    public AMapLocationClient mLocationClient = null;
+    //声明定位回调监听器
+    public AMapLocationListener mLocationListener;
+    //声明AMapLocationClientOption对象
+    public AMapLocationClientOption mLocationOption = null;
 
     private static final int UPDATE_TODAY_WEATHER = 1;
 
-    private Handler mHandler = new Handler() {//这一段不是很明白
+    private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
                 case UPDATE_TODAY_WEATHER:
@@ -71,7 +84,10 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
             Log.d("myWeather", "网络挂了");
             Toast.makeText(MainActivity.this, "网络挂了！", Toast.LENGTH_LONG).show();
         }
+
         mUpdateBtn = (ImageView) findViewById(R.id.title_update_btn);
+        mLocation=(ImageView)findViewById(R.id.title_location);
+        mLocation.setOnClickListener(this);
         mUpdateBtn.setOnClickListener(this);
         pbar = (ProgressBar) findViewById(R.id.title_update_progress);
 
@@ -400,6 +416,45 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
 
     @Override
     public void onClick(View v) {
+
+        if(v.getId()==R.id.title_location){
+            //初始化定位
+            mLocationClient = new AMapLocationClient(getApplicationContext());
+            //设置定位回调监听
+            //初始化AMapLocationClientOption对象
+            mLocationOption = new AMapLocationClientOption();
+            //设置定位模式为AMapLocationMode.Battery_Saving，低功耗模式。
+            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);
+            mLocationOption.setMockEnable(true);
+            //获取一次定位结果：
+            //该方法默认为false。
+            mLocationOption.setOnceLocation(true);
+            mLocationOption.setOnceLocationLatest(true);
+            mLocationClient.setLocationOption(mLocationOption);
+            mLocationListener = new AMapLocationListener() {
+                @Override
+                public void onLocationChanged(AMapLocation aMapLocation) {
+
+                    if (aMapLocation != null) {
+                        if (aMapLocation.getErrorCode() == 0) {
+                            //可在其中解析amapLocation获取相应内容。
+                            Log.e("AmapSuccess",aMapLocation.getCity());
+                            Toast.makeText(MainActivity.this, "城市是"+aMapLocation.getCity(), Toast.LENGTH_LONG).show();
+                        }else {
+                            //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
+                            Log.e("AmapError","location Error, ErrCode:"
+                                    + aMapLocation.getErrorCode() + ", errInfo:"
+                                    + aMapLocation.getErrorInfo());
+                        }
+                    }
+                }
+            };
+            //给定位客户端对象设置定位参数
+            mLocationClient.setLocationOption(mLocationOption);
+            mLocationClient.setLocationListener(mLocationListener);
+            //启动定位
+            mLocationClient.startLocation();
+        }
 
         if (v.getId() == R.id.title_city_manager) {
             Intent i = new Intent(this, CityActivity.class);
