@@ -95,6 +95,9 @@ public class MainActivity extends Activity implements OnClickListener {
         mCitySelect.setOnClickListener(this);
 
         initView();
+        SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
+        String cityCode = sharedPreferences.getString("main_city_code", "101010100");
+        queryWeatherCode(cityCode);
     }
 
     void initView() {
@@ -424,7 +427,7 @@ public class MainActivity extends Activity implements OnClickListener {
             //初始化AMapLocationClientOption对象
             mLocationOption = new AMapLocationClientOption();
             //设置定位模式为AMapLocationMode.Battery_Saving，低功耗模式。
-            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);
+            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
             mLocationOption.setMockEnable(true);
             //获取一次定位结果：
             //该方法默认为false。

@@ -2,6 +2,7 @@ package com.example.administrator.myapplication.miniWeather;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -32,6 +33,17 @@ public class GuideActivity extends Activity implements ViewPager.OnPageChangeLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.guide);//只用findViewById的时候是在guide里面找
+        SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
+        Boolean first = sharedPreferences.getBoolean("first",true);
+        if(first){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("first", false);
+            editor.commit();
+        }else{
+            Intent i =new Intent(GuideActivity.this,MainActivity.class);
+            startActivity(i);
+            finish();
+        }
         initView();
         initDots();
         btn=(Button)views.get(2).findViewById(R.id.btn);

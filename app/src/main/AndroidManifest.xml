@@ -49,14 +49,14 @@
         </meta-data>
         <service android:name="com.amap.api.location.APSService"></service>
         <activity android:name=".miniWeather.MainActivity">
+
+        </activity>
+        <activity android:name=".miniWeather.CityActivity"></activity>
+        <activity android:name=".miniWeather.GuideActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name=".miniWeather.CityActivity"></activity>
-        <activity android:name=".miniWeather.GuideActivity">
-
         </activity>
 
         <activity
