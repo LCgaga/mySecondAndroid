@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +21,8 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.example.administrator.myapplication.R;
+import com.example.administrator.myapplication.app.MyApplication;
+import com.example.administrator.myapplication.bean.City;
 import com.example.administrator.myapplication.bean.TodayWeather;
 import com.example.administrator.myapplication.util.NetUtil;
 
@@ -34,6 +37,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/9/21.
@@ -51,6 +55,8 @@ public class MainActivity extends Activity implements OnClickListener {
     private ImageView mUpdateBtn;
     private ImageView mLocation;
     private ProgressBar pbar;
+    private LinearLayout llyout;
+    private List<City> mCityList;
 
     //声明AMapLocationClient类对象
     public AMapLocationClient mLocationClient = null;
@@ -94,13 +100,24 @@ public class MainActivity extends Activity implements OnClickListener {
         mCitySelect = (ImageView) findViewById(R.id.title_city_manager);
         mCitySelect.setOnClickListener(this);
 
+        MyApplication app = (MyApplication) getApplication();
+        mCityList = app.getCityList();
+
         initView();
         SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
         String cityCode = sharedPreferences.getString("main_city_code", "101010100");
         queryWeatherCode(cityCode);
+
+        String str="北京市";
+        str=str.replace("市","");
+        Log.e("Stringtest",""+str.length()+" and "+str);
+
     }
 
     void initView() {
+
+        llyout=(LinearLayout)findViewById(R.id.pm2_5_content);
+
         city_name_Tv = (TextView) findViewById(R.id.title_city_name);
         temperature_now = (TextView) findViewById(R.id.temperature_now);
         cityTv = (TextView) findViewById(R.id.city);
@@ -137,17 +154,7 @@ public class MainActivity extends Activity implements OnClickListener {
         weatherImg_a3 = (ImageView) findViewById(R.id.a3_weather_img);
         weatherImg_a4 = (ImageView) findViewById(R.id.a4_weather_img);
         weatherImg_b1 = (ImageView) findViewById(R.id.b1_weather_img);
-        city_name_Tv.setText("N/A");
-        cityTv.setText("N/A");
-        timeTv.setText("N/A");
-        humidityTv.setText("N/A");
-        pmDataTv.setText("N/A");
-        pmQualityTv.setText("N/A");
-        temperature_now.setText("N/A");
-        weekTv.setText("N/A");
-        temperatureTv.setText("N/A");
-        climateTv.setText("N/A");
-        windTv.setText("N/A");
+
     }//findId后并置为N/A
 
     private TodayWeather parseXML(String xmldata) {
@@ -327,22 +334,28 @@ public class MainActivity extends Activity implements OnClickListener {
         timeTv.setText(todayWeather.getUpdatetime() + "发布");
         humidityTv.setText("湿度：" + todayWeather.getShidu());
         temperature_now.setText(todayWeather.getWendu() + "℃");
-        pmDataTv.setText(todayWeather.getPm25());
+
 
         int pm25 = Integer.parseInt(todayWeather.getPm25());
-        if (pm25 <= 50)
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
-        if (pm25 > 50 && pm25 <= 100)
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_51_100);
-        if (pm25 > 100 && pm25 <= 150)
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_101_150);
-        if (pm25 > 150 && pm25 <= 200)
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_151_200);
-        if (pm25 > 200 && pm25 <= 300)
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_201_300);
-        if (pm25 > 300)
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_greater_300);
-
+        if(pm25==-1){
+            llyout.setVisibility(View.INVISIBLE);
+        }else {
+            llyout.setVisibility(View.VISIBLE);
+            pmQualityTv.setText(todayWeather.getQuality());
+            pmDataTv.setText(todayWeather.getPm25());
+            if (pm25 <= 50)
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
+            if (pm25 > 50 && pm25 <= 100)
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_51_100);
+            if (pm25 > 100 && pm25 <= 150)
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_101_150);
+            if (pm25 > 150 && pm25 <= 200)
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_151_200);
+            if (pm25 > 200 && pm25 <= 300)
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_201_300);
+            if (pm25 > 300)
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_greater_300);
+        }
         setType(todayWeather.getType(), weatherImg);
         setType(todayWeather.getType(),weatherImg_today);
         setType(todayWeather.getA1_type(), weatherImg_a1);
@@ -351,7 +364,6 @@ public class MainActivity extends Activity implements OnClickListener {
         setType(todayWeather.getA4_type(), weatherImg_a4);
         setType(todayWeather.getB1_type(), weatherImg_b1);
 
-        pmQualityTv.setText(todayWeather.getQuality());
         weekTv.setText(todayWeather.getDate());
         weekTv_today.setText(todayWeather.getDate());
         weekTv_a1.setText(todayWeather.getA1_day());
@@ -441,8 +453,19 @@ public class MainActivity extends Activity implements OnClickListener {
                     if (aMapLocation != null) {
                         if (aMapLocation.getErrorCode() == 0) {
                             //可在其中解析amapLocation获取相应内容。
-                            Log.e("AmapSuccess",aMapLocation.getCity());
-                            Toast.makeText(MainActivity.this, "城市是"+aMapLocation.getCity(), Toast.LENGTH_LONG).show();
+                            //Log.e("AmapSuccess",aMapLocation.getCityCode());
+                            String citystr=aMapLocation.getCity().replace("市","");
+                            String cityCode;
+                            int len = mCityList.size();
+                            for (int i = 0; i < len; i++) {
+                                if(mCityList.get(i).getCity().equals(citystr)){
+                                    cityCode=mCityList.get(i).getNumber();
+                                    queryWeatherCode(cityCode);
+                                    break;
+                                }
+                            }
+
+                            Toast.makeText(MainActivity.this, "城市是"+citystr, Toast.LENGTH_LONG).show();
                         }else {
                             //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                             Log.e("AmapError","location Error, ErrCode:"

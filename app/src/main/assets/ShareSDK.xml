@@ -60,8 +60,8 @@
     <SinaWeibo
         Id="1"
         SortId="1"
-        AppKey="568898243"
-        AppSecret="38a4f8204cc784f81f9f0daaf31e02e3"
+        AppKey="1243120568"
+        AppSecret="f1f5f463d2b361cff96bf9ed71d2e245"
         RedirectUrl="http://www.sharesdk.cn"
         ShareByAppClient="true"
         Enable="true" />
@@ -77,8 +77,8 @@
     <QZone
         Id="3"
         SortId="3"
-        AppId="100371282"
-        AppKey="aed9b0303e3ed1e27bae87c33761161d"
+        AppId="1105833631"
+        AppKey="czhreFaAHwKXzvec"
         Enable="true" />
     
     <!-- 
