@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.administrator.myapplication.bean.City;
+import com.example.administrator.myminiweather.bean.City;
 
 import java.util.ArrayList;
 import java.util.List;
