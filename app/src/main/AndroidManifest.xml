@@ -42,7 +42,7 @@
         android:name=".app.MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/icon"
-        android:label="MiniWeather"
+        android:label="@string/label_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <meta-data android:name="com.amap.api.v2.apikey" android:value="cfc700b55880e70ff58cdc640bc9c0b2">
